@@ -41,32 +41,46 @@ CLI_MAIN_MENU = f'''
 def command_list_movies():
     """Retrieve and display all movies from the database."""
     movies = storage.list_movies()
-    print(f"\n{BColors.OK_CYAN}#️⃣ {len(movies)} movies in total{BColors.ENDC}")
+    print(f"\n{BColors.OK_CYAN}#️⃣ {len(movies)} movies "
+          f"in total{BColors.ENDC}")
+
     for movie, data in movies.items():
-        print(f"{BColors.OK_BLUE}🎬 {movie}: {data['rating']} ({data['year']}){BColors.ENDC}")
+        print(f"{BColors.OK_BLUE}🎬 {movie}: {data['rating']} "
+              f"({data['year']}){BColors.ENDC}")
 
 
 def command_add_movie():
     """Add a new movie to the database."""
+    request_try_count = 0
     while True:
+        # Break when API raise RequestException 3 times
+        if request_try_count == 3:
+            print(f"{BColors.FAIL}{BColors.BOLD}API is not"
+                  f"available..try again later!{BColors.ENDC}")
+            break
+
         movies =  storage.list_movies()
         title = input('\nChoose the movie title: ')
         if title in movies:
-            print(f"{BColors.FAIL}{BColors.BOLD}Movie {title} already exist!{BColors.ENDC}")
+            print(f"{BColors.FAIL}{BColors.BOLD}Movie {title} "
+                  f"already exist!{BColors.ENDC}")
             continue
 
         if title == '':
-            print(f"{BColors.FAIL}{BColors.BOLD}You need to type something!{BColors.ENDC}")
+            print(f"{BColors.FAIL}{BColors.BOLD}You need "
+                  f"to type something!{BColors.ENDC}")
             continue
 
         params = {
             "type": "movie",
             't': title,
         }
+
         # Fetch movies data from OMDbAPI
         try:
             api_result = requests.get(API_URL, params=params).json()
         except requests.exceptions.RequestException as error:
+            request_try_count += 1
             print(f"{BColors.FAIL}Can't get a valid response: "
             f"{str(error).split('(')[0]}{BColors.ENDC}")
             continue
@@ -90,13 +104,13 @@ def command_add_movie():
         if len(api_result['Poster']) > 0:
             img_url = api_result['Poster']
 
-        # stops if any of the required data is missing
+        # Stops if any of the required data is missing
         if year is None or rating is None or img_url is None:
             print(f"{BColors.FAIL}{BColors.BOLD}Movie "
                   f"{title} has some missing data!{BColors.ENDC}")
             continue
 
-        # add fetched data to the database
+        # Adds fetched data to the database
         storage.add_movie(title, year, rating, img_url)
         print(f"\n{BColors.OK_GREEN}{BColors.BOLD}{title} ({year}) "
               f"is now in the DB with the rating of {rating}{BColors.ENDC}")
