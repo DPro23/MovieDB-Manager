@@ -35,7 +35,7 @@ CLI_MAIN_MENU = f'''
 {BColors.OK_BLUE}8. Movies sorted by rating{BColors.ENDC}
 {BColors.OK_BLUE}9. Generate Website{BColors.ENDC}
 {'〰️' * 18}\n
-{BColors.HEADER}{BColors.BOLD}Enter choice (0-8): {BColors.ENDC}'''
+{BColors.HEADER}{BColors.BOLD}Enter choice (0-9): {BColors.ENDC}'''
 
 
 def command_list_movies():
@@ -236,9 +236,42 @@ def command_generate_website():
 
     # Create static folder if it doesn't exist
     os.makedirs(os.path.dirname(dst_index_path), exist_ok=True)
-    # Copy files from _static to static
-    shutil.copy(src_index_path, dst_index_path)
+    # Copy the style.css without changes
     shutil.copy(src_css_path, dst_css_path)
+
+    # Read index_template.html from _static
+    with open(src_index_path, "r") as src_index:
+        html_raw = src_index.read()
+        # Row where to append the list elements
+        movie_grid_row = 11
+
+    """
+    Generate static files in /static
+    using _static/index_template.html
+    and renders movies from the database
+    """
+    with open(dst_index_path, "w") as dst_index:
+        for line_num, line in enumerate(html_raw.split('\n'), start=1):
+            if line_num == movie_grid_row:
+                dst_index.write(f"{line}\n")
+                # Get movies from database
+                movies = storage.list_movies()
+                full_list = ""
+                for movie, data in movies.items():
+                    element_to_append = f"""<li>
+            <div class="movie">
+                <img class="movie-poster"
+                     src={data['img_url']}/>
+                <div class="movie-title">{movie}</div>
+                <div class="movie-year">{data['year']}</div>
+            </div>
+        </li>
+                    """
+                    full_list += element_to_append
+                dst_index.write(full_list)
+            else:
+                dst_index.write(f"{line}\n")
+
     print(f"{BColors.OK_GREEN}Website was generated successfully.{BColors.ENDC}")
 
 

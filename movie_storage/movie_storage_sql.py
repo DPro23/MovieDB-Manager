@@ -2,7 +2,7 @@
 from sqlalchemy import create_engine, text
 
 # Define the database URL
-DB_URL = "sqlite:///movies.db"
+DB_URL = "sqlite:///movie_storage/movies.db"
 # Create the engine to connect to the DB
 engine = create_engine(DB_URL, echo=False)
 
@@ -10,10 +10,10 @@ engine = create_engine(DB_URL, echo=False)
 def list_movies():
     """Retrieve all movies from the database."""
     with engine.connect() as connection:
-        result = connection.execute(text("SELECT title, year, rating FROM movies"))
+        result = connection.execute(text("SELECT title, year, rating, img_url FROM movies"))
         movies = result.fetchall()
 
-    return {row[0]: {"year": row[1], "rating": row[2]} for row in movies}
+    return {row[0]: {"year": row[1], "rating": row[2], "img_url": row[3]} for row in movies}
 
 
 def add_movie(title, year, rating, img_url):
@@ -23,7 +23,7 @@ def add_movie(title, year, rating, img_url):
             connection.execute(text("INSERT INTO movies (title, year, rating, img_url) VALUES (:title, :year, :rating, :img_url)"),
                                {"title": title, "year": year, "rating": rating, "img_url": img_url})
             connection.commit()
-            print(f"Movie '{title}' added successfully.")
+            #print(f"Movie '{title}' added successfully.")
         except Exception as e:
             print(f"Error: {e}")
 
