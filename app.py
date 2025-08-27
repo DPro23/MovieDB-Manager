@@ -1,11 +1,10 @@
 """Run commands to manage a movie database."""
 import os
-
 import requests
 import random
 import statistics
 import shutil
-import movie_storage_sql as storage
+from movie_storage import movie_storage_sql as storage
 
 API_KEY = "8da11d34"
 API_URL = f"http://www.omdbapi.com/?i=tt3896198&apikey={API_KEY}&"
@@ -94,7 +93,7 @@ def command_add_movie():
         # stops if any of the required data is missing
         if year is None or rating is None or img_url is None:
             print(f"{BColors.FAIL}{BColors.BOLD}Movie "
-                  f"{title} has missing data!{BColors.ENDC}")
+                  f"{title} has some missing data!{BColors.ENDC}")
             continue
 
         # add fetched data to the database
@@ -111,7 +110,7 @@ def command_delete_movie():
         title = input('\nSelect movie to delete: ')
         if title not in movies:
             print(f'\n{BColors.FAIL}{BColors.BOLD}Movie is not in the DB{BColors.ENDC}')
-            continue
+            break
 
         storage.delete_movie(title)
         print(f'{BColors.OK_GREEN}{BColors.BOLD}{title} deleted!{BColors.ENDC}')
@@ -119,14 +118,13 @@ def command_delete_movie():
 
 
 def update_movie():
-    """UPDATE RATING OF A MOVIE"""
+    """TODO: Update a movie from the database."""
     movies = storage.list_movies()
     while True:
         title = input('\nType movie title to update: ')
-
         if title not in movies:
             print(f'\n{BColors.FAIL}{BColors.BOLD}Movie is not in the DB{BColors.ENDC}')
-            continue
+            break
 
         rating = float(input(f'\nType {title} new rating: '))
         if rating in range(1, 11):
@@ -137,6 +135,7 @@ def update_movie():
 
         print(f'\n{BColors.FAIL}{BColors.BOLD}Rating out of range!{BColors.ENDC}')
         continue
+
 
 def command_get_stats():
     """Shows general statistics about the database."""
@@ -195,7 +194,7 @@ def command_search_movie():
 
         if count == 0:
             print(f'\n{BColors.FAIL}{BColors.BOLD}Nothing found!{BColors.ENDC}')
-            continue
+            break
         break
 
 
