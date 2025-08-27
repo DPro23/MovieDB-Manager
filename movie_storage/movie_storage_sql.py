@@ -36,7 +36,7 @@ def delete_movie(title):
                 text("DELETE FROM movies WHERE title = :title"),
                 {"title": title})
             connection.commit()
-            print(f"Movie '{title}' deleted successfully.")
+            #print(f"Movie '{title}' deleted successfully.")
         except Exception as e:
             print(f"Error: {e}")
 

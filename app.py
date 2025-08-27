@@ -61,10 +61,6 @@ def command_add_movie():
 
         movies =  storage.list_movies()
         title = input('\nChoose the movie title: ')
-        if title in movies:
-            print(f"{BColors.FAIL}{BColors.BOLD}Movie {title} "
-                  f"already exist!{BColors.ENDC}")
-            continue
 
         if title == '':
             print(f"{BColors.FAIL}{BColors.BOLD}You need "
@@ -94,6 +90,15 @@ def command_add_movie():
         year = None
         rating = None
         img_url = None
+
+        if len(api_result['Title']) > 0:
+            title = api_result['Title']
+
+        # Stops if movie is already in the database
+        if title in movies:
+            print(f"{BColors.FAIL}{BColors.BOLD}Movie {title} "
+                  f"already exist!{BColors.ENDC}")
+            continue
 
         if len(api_result['Year']) == 4:
             year = api_result['Year']
