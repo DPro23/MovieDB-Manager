@@ -255,22 +255,33 @@ def command_generate_website():
     """
     with open(dst_index_path, "w") as dst_index:
         for line_num, line in enumerate(html_raw.split('\n'), start=1):
+            # Append li elements after <ol class="movie-grid">
             if line_num == movie_grid_row:
                 dst_index.write(f"{line}\n")
                 # Get movies from database
                 movies = storage.list_movies()
                 full_list = ""
                 for movie, data in movies.items():
-                    element_to_append = f"""<li>
+                    # Define positive or negative ratings
+                    last_negative_rating = 5.99
+                    rating_class = "movie-rating-"
+
+                    if float(data['rating']) > last_negative_rating:
+                        rating_class += 'positive'
+                    else:
+                        rating_class += 'negative'
+
+                    movie_to_append = f"""<li>
             <div class="movie">
                 <img class="movie-poster"
                      src={data['img_url']}/>
                 <div class="movie-title">{movie}</div>
                 <div class="movie-year">{data['year']}</div>
+                <div class={rating_class}>{data['rating']}/10</div>
             </div>
         </li>
                     """
-                    full_list += element_to_append
+                    full_list += movie_to_append
                 dst_index.write(full_list)
             else:
                 dst_index.write(f"{line}\n")

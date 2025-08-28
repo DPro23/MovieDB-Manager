@@ -19,6 +19,7 @@ body {
   margin-top: 20px;
   display: flex;
   justify-content: center;
+  flex-wrap: wrap
 }
 
 .movie-grid li {
@@ -31,7 +32,9 @@ body {
 }
 
 .movie-title,
-.movie-year {
+.movie-year,
+.movie-rating-positive,
+.movie-rating-negative {
   font-size: 0.8em;
   text-align: center;
 }
@@ -44,6 +47,13 @@ body {
   color: #999;
 }
 
+.movie-rating-positive {
+  color: #009b50;
+}
+
+.movie-rating-negative {
+  color: #df091a;
+}
 
 .movie-poster {
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
