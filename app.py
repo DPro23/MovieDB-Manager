@@ -90,6 +90,7 @@ def command_add_movie():
         year = None
         rating = None
         img_url = None
+        user_id = 0
 
         if len(api_result['Title']) > 0:
             title = api_result['Title']
@@ -116,7 +117,7 @@ def command_add_movie():
             continue
 
         # Adds fetched data to the database
-        storage.add_movie(title, year, rating, img_url)
+        storage.add_movie(title, year, rating, img_url, user_id )
         print(f"\n{BColors.OK_GREEN}{BColors.BOLD}{title} ({year}) "
               f"is now in the DB with the rating of {rating}{BColors.ENDC}")
         break
@@ -136,24 +137,21 @@ def command_delete_movie():
         break
 
 
-def update_movie():
-    """TODO: Update a movie from the database."""
+def command_update_movie():
+    """Update a movie from the database."""
     movies = storage.list_movies()
     while True:
-        title = input('\nType movie title to update: ')
+        title = input('\nChoose the movie title: ')
         if title not in movies:
             print(f'\n{BColors.FAIL}{BColors.BOLD}Movie is not in the DB{BColors.ENDC}')
             break
 
-        rating = float(input(f'\nType {title} new rating: '))
-        if rating in range(1, 11):
-            storage.update_movie(title, rating)
-            print(f'\n{BColors.OK_GREEN}'
-                  f'{BColors.BOLD}{title} rating changed to {rating}{BColors.ENDC}')
-            break
-
-        print(f'\n{BColors.FAIL}{BColors.BOLD}Rating out of range!{BColors.ENDC}')
-        continue
+        note = input(f'\nAdd a note to {title}: ')
+        # Add a note to the movie in the database
+        storage.update_movie(title, note)
+        print(f'\n{BColors.OK_GREEN}'
+              f'{BColors.BOLD}{title} has a new note!{BColors.ENDC}')
+        break
 
 
 def command_get_stats():
@@ -287,7 +285,7 @@ def main():
       1: command_list_movies,
       2: command_add_movie,
       3: command_delete_movie,
-      4: update_movie,
+      4: command_update_movie,
       5: command_get_stats,
       6: command_random_movie,
       7: command_search_movie,

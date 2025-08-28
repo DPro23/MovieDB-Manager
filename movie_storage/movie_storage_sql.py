@@ -10,20 +10,27 @@ engine = create_engine(DB_URL, echo=False)
 def list_movies():
     """Retrieve all movies from the database."""
     with engine.connect() as connection:
-        result = connection.execute(text("SELECT title, year, rating, img_url FROM movies"))
+        result = connection.execute(text("SELECT title, year, rating, img_url, note, user_id FROM movies"))
         movies = result.fetchall()
 
     return {row[0]: {"year": row[1], "rating": row[2], "img_url": row[3]} for row in movies}
 
 
-def add_movie(title, year, rating, img_url):
+def add_movie(title, year, rating, img_url, user_id):
     """Add a new movie to the database."""
     with engine.connect() as connection:
         try:
-            connection.execute(text("INSERT INTO movies (title, year, rating, img_url) VALUES (:title, :year, :rating, :img_url)"),
-                               {"title": title, "year": year, "rating": rating, "img_url": img_url})
+            connection.execute(text("""
+            INSERT INTO movies (title, year, rating, img_url, user_id) 
+            VALUES (:title, :year, :rating, :img_url, :user_id)"""),
+                               {
+                                   "title": title,
+                                   "year": year,
+                                   "rating": rating,
+                                   "img_url": img_url,
+                                   "user_id": user_id
+                               })
             connection.commit()
-            #print(f"Movie '{title}' added successfully.")
         except Exception as e:
             print(f"Error: {e}")
 
@@ -36,28 +43,43 @@ def delete_movie(title):
                 text("DELETE FROM movies WHERE title = :title"),
                 {"title": title})
             connection.commit()
-            #print(f"Movie '{title}' deleted successfully.")
         except Exception as e:
             print(f"Error: {e}")
 
 
-def update_movie(title, rating):
-    """Update a movie's rating in the database."""
-    pass
+def update_movie(title, note):
+    """Add a note to a movie and store it in the database."""
+    with engine.connect() as connection:
+        try:
+            connection.execute(
+                text("UPDATE movies SET note = :note WHERE title = :title"),
+                {"title": title, "note": note})
+            connection.commit()
+        except Exception as e:
+            print(f"Error: {e}")
 
 
 def create_movies_table():
     """Create the movies table if it does not exist"""
     with engine.connect() as connection:
         connection.execute(text("""
-            CREATE TABLE IF NOT EXISTS movies (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT UNIQUE NOT NULL,
-                year INTEGER NOT NULL,
-                rating REAL NOT NULL,
-                img_url TEXT NOT NULL
-            )
-        """))
+                    CREATE TABLE IF NOT EXISTS users (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT UNIQUE NOT NULL
+                    );
+                    """))
+        connection.execute(text("""
+                    CREATE TABLE IF NOT EXISTS movies (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        title TEXT UNIQUE NOT NULL,
+                        year INTEGER NOT NULL,
+                        rating REAL NOT NULL,
+                        img_url TEXT NOT NULL,
+                        note TEXT NULL DEFAULT '',
+                        user_id INTEGER NOT NULL,
+                        foreign KEY (user_id) REFERENCES users (id)
+                    );
+                    """))
         connection.commit()
 
 
