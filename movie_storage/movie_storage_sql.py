@@ -10,10 +10,15 @@ engine = create_engine(DB_URL, echo=False)
 def list_movies():
     """Retrieve all movies from the database."""
     with engine.connect() as connection:
-        result = connection.execute(text("SELECT title, year, rating, img_url, note, user_id FROM movies"))
+        result = connection.execute(text("SELECT title, year, rating, img_url, note FROM movies"))
         movies = result.fetchall()
 
-    return {row[0]: {"year": row[1], "rating": row[2], "img_url": row[3]} for row in movies}
+    return {row[0]: {
+        "year": row[1],
+        "rating": row[2],
+        "img_url": row[3],
+        "note": row[4]}
+        for row in movies}
 
 
 def add_movie(title, year, rating, img_url, user_id):
@@ -21,14 +26,16 @@ def add_movie(title, year, rating, img_url, user_id):
     with engine.connect() as connection:
         try:
             connection.execute(text("""
-            INSERT INTO movies (title, year, rating, img_url, user_id) 
-            VALUES (:title, :year, :rating, :img_url, :user_id)"""),
+            INSERT INTO movies (title, year, rating, img_url, user_id, note) 
+            VALUES (:title, :year, :rating, :img_url, :user_id, :note)"""),
                                {
                                    "title": title,
                                    "year": year,
                                    "rating": rating,
                                    "img_url": img_url,
-                                   "user_id": user_id
+                                   "user_id": user_id,
+                                   # title is the default note
+                                   "note": title
                                })
             connection.commit()
         except Exception as e:
@@ -75,7 +82,7 @@ def create_movies_table():
                         year INTEGER NOT NULL,
                         rating REAL NOT NULL,
                         img_url TEXT NOT NULL,
-                        note TEXT NULL DEFAULT '',
+                        note TEXT NOT NULL,
                         user_id INTEGER NOT NULL,
                         foreign KEY (user_id) REFERENCES users (id)
                     );

@@ -117,7 +117,7 @@ def command_add_movie():
             continue
 
         # Adds fetched data to the database
-        storage.add_movie(title, year, rating, img_url, user_id )
+        storage.add_movie(title, year, rating, img_url, user_id)
         print(f"\n{BColors.OK_GREEN}{BColors.BOLD}{title} ({year}) "
               f"is now in the DB with the rating of {rating}{BColors.ENDC}")
         break
@@ -270,11 +270,15 @@ def command_generate_website():
                         rating_class += 'positive'
                     else:
                         rating_class += 'negative'
+                    # TODO: Find a way to avoid underscore
+                    note = data['note'].replace(' ', '_')
 
                     movie_to_append = f"""<li>
             <div class="movie">
                 <img class="movie-poster"
-                     src={data['img_url']}/>
+                     src={data['img_url']}
+                     title={note}
+                     />
                 <div class="movie-title">{movie}</div>
                 <div class="movie-year">{data['year']}</div>
                 <div class={rating_class}>{data['rating']}/10</div>
