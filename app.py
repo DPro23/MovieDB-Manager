@@ -1,4 +1,5 @@
 """Run commands to manage a movie database."""
+from dotenv import load_dotenv
 import os
 import requests
 import random
@@ -6,7 +7,9 @@ import statistics
 import shutil
 from movie_storage import movie_storage_sql as storage
 
-API_KEY = "8da11d34"
+load_dotenv()
+
+API_KEY = os.getenv("OMDB_API_KEY")
 API_URL = f"http://www.omdbapi.com/?i=tt3896198&apikey={API_KEY}&"
 
 class BColors:
@@ -24,7 +27,6 @@ class BColors:
 CLI_MAIN_MENU = f'''
 {BColors.OK_CYAN}{BColors.UNDERLINE}{BColors.BOLD}{'〰️' * 5} DB from Danilo {'〰️' * 5}{BColors.ENDC}
 {BColors.BOLD}{BColors.HEADER}#. Menu options{BColors.ENDC}
-{BColors.OK_BLUE}0. Quit{BColors.ENDC}
 {BColors.OK_BLUE}1. List movies{BColors.ENDC}
 {BColors.OK_BLUE}2. Add movie{BColors.ENDC}
 {BColors.OK_BLUE}3. Delete movie{BColors.ENDC}
@@ -34,6 +36,7 @@ CLI_MAIN_MENU = f'''
 {BColors.OK_BLUE}7. Search movie{BColors.ENDC}
 {BColors.OK_BLUE}8. Movies sorted by rating{BColors.ENDC}
 {BColors.OK_BLUE}9. Generate Website{BColors.ENDC}
+{BColors.OK_BLUE}0. Quit{BColors.ENDC}
 {'〰️' * 18}\n
 {BColors.HEADER}{BColors.BOLD}Enter choice (0-9): {BColors.ENDC}'''
 
